@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "743335305278",
+    "firebase_url": "https://pfsmessager.firebaseio.com",
+    "project_id": "pfsmessager",
+    "storage_bucket": "pfsmessager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743335305278:android:86d76a6865682815",
+        "android_client_info": {
+          "package_name": "com.rosscradock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743335305278-mao58pjp3npjiecq095bjuj273n3n0nn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgbtVegwAaaRLxiMDKsVm-MIh2_gpDasE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743335305278:android:aa864e37dae70f96",
+        "android_client_info": {
+          "package_name": "com.rosscradock.pfsmessager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743335305278-pgjbj69db00rnmtua0dlqspukf6uuckh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rosscradock.pfsmessager",
+            "certificate_hash": "183424e5558cb7ee3f49cfa78c02203a73c4ec0b"
+          }
+        },
+        {
+          "client_id": "743335305278-mao58pjp3npjiecq095bjuj273n3n0nn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgbtVegwAaaRLxiMDKsVm-MIh2_gpDasE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "743335305278-mao58pjp3npjiecq095bjuj273n3n0nn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
