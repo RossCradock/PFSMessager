@@ -9,47 +9,63 @@
     tools:context="com.rosscradock.pfsmessager.activities.MessageActivity">
 
 
-    <EditText
-        android:id="@+id/contact_name_message_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/contact_name_message_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/loop"
+        app:layout_constraintHorizontal_bias="0.503" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/key"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="28dp"
+        app:layout_constraintLeft_toRightOf="@+id/contact_name_message_textview"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:id="@+id/contact_name_message_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:gravity="center"
         android:inputType="textPersonName"
         android:text="Name"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/messages_listview"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
+    <TextView
         android:id="@+id/empty_message_listview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="64dp"
         android:ems="10"
         android:gravity="center"
         android:inputType="textPersonName"
         android:text="No Messages"
         app:layout_constraintTop_toBottomOf="@+id/contact_name_message_textview"
-        tools:layout_editor_absoluteX="85dp" />
-
-    <ListView
-        android:id="@+id/messages_listview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/include"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/contact_name_message_textview" />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <include
         layout="@layout/message_text_area"
@@ -65,5 +81,32 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"
         android:id="@+id/include" />
+
+    <ListView
+        android:id="@+id/messages_listview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/include"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/change_keys_message_button" />
+
+    <Button
+        android:id="@+id/change_keys_message_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:background="#00000000"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintLeft_toRightOf="@+id/contact_name_message_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

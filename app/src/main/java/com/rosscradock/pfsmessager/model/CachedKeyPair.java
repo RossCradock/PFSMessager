@@ -1,7 +1,5 @@
 package com.rosscradock.pfsmessager.model;
 
-import java.security.KeyPair;
-
 import io.realm.RealmObject;
 
 public class CachedKeyPair extends RealmObject{

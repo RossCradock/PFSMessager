@@ -48,7 +48,7 @@ public class KeyCheckOnline {
 
     public static void newUser(final Context context, final String username){
 
-        String[] publicKeys = {};
+        String[] publicKeys = new String[10];
         for(int i = 0; i < 10; i++){
             String publicKey = KeyService.generateOnlineKeys(context);
             if(publicKey.contains("failed")){

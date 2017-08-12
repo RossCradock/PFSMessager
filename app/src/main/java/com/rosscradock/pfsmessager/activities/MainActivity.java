@@ -12,7 +12,6 @@ import android.widget.ListView;
 
 import com.rosscradock.pfsmessager.R;
 import com.rosscradock.pfsmessager.arrayAdapters.ContactArrayAdapter;
-import com.rosscradock.pfsmessager.encrypt.KeyService;
 import com.rosscradock.pfsmessager.model.Contact;
 
 import java.util.List;
