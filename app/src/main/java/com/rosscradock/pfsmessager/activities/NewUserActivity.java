@@ -23,6 +23,13 @@ import io.realm.Realm;
 
 public class NewUserActivity extends AppCompatActivity {
 
+    /**
+     * This activity deals with both the user registering with the service for the first time
+     * and a user searching for other users so there is a switch to determine the what to do.
+     * The response for both "/account/newUser" and "/account/checkUsername" can be
+     * "username exists".
+     */
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -49,12 +56,23 @@ public class NewUserActivity extends AppCompatActivity {
                     @Override
                     public void onTaskCompleted(final String response) {
 
-                        if(response.contains("username exists")){
-                            if(origin.equals("user")){
-                                badEntry.setText("Username Taken Try Another");
-                            }else{
+                        boolean userNameInDatabase = response.contains("username exists");
+                        boolean newUser = origin.equals("user");
 
-                                // for new contact
+                        // check the circumstance for switch
+                        int scenario = 0;
+                        scenario = (userNameInDatabase && !newUser) ? 1 :scenario;
+                        scenario = (!userNameInDatabase && newUser) ? 2 :scenario;
+                        scenario = (!userNameInDatabase && !newUser) ? 3 :scenario;
+
+                        switch(scenario){
+                            case 0:
+                                // new user with username taken
+                                badEntry.setText("Username Taken Try Another");
+                                break;
+
+                            case 1:
+                                // new contact that exists in online database
                                 final Contact contact = new Contact();
                                 realm.executeTransaction(new Realm.Transaction() {
                                     @Override
@@ -63,21 +81,26 @@ public class NewUserActivity extends AppCompatActivity {
                                             // take username from json response
                                             JSONObject jsonObject = new JSONObject(response);
                                             contact.setUsername(jsonObject.getString("username"));
+                                            contact.setPublicKey(jsonObject.getString("publicKey"));
+                                            contact.setHashedKeyCount(0);
+
+                                            Toast.makeText(NewUserActivity.this, "New Contact Added", Toast.LENGTH_LONG).show();
+
+                                            startActivity(new Intent(NewUserActivity.this, MessageActivity.class));
+                                            finish();
                                         } catch (JSONException e) {
                                             Toast.makeText(NewUserActivity.this, "JSON Error with response conversion to contact", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
-                                Intent intent =new Intent(NewUserActivity.this, MessageActivity.class);
-                                intent.putExtra("contact", contact.getUsername());
-                                startActivity(intent);
-                            }
-                        }
 
-                        if(response.contains("username does not exist")){
-                            if(origin.equals("user")) {
+                                break;
 
-                                // store in database
+                            case 2:
+                                // new user with username not taken in data base
+                                KeyCheckOnline.newUser(NewUserActivity.this, usernameEntry.getText().toString());
+
+                                // find user in database and set the username
                                 realm.executeTransaction(new Realm.Transaction() {
                                     @Override
                                     public void execute(Realm realm) {
@@ -85,26 +108,29 @@ public class NewUserActivity extends AppCompatActivity {
                                         user.setUsername(usernameEntry.getText().toString());
                                     }
                                 });
-                                KeyCheckOnline.newUser(usernameEntry.getText().toString());
+
                                 // goto to main screen
                                 startActivity(new Intent(NewUserActivity.this, MainActivity.class));
-                            } else{
+                                finish();
+                                break;
+
+                            case 3:
+                                // new contact is not in online database
                                 badEntry.setText("Username Does Not Exist");
-                            }
+                                break;
                         }
                     }
                 });
 
                 JSONObject jsonObject = new JSONObject();
                 try {
+                    String url = (origin.equals("user")) ? "/account/newUser" : "/account/checkUsername";
                     jsonObject.put("username", usernameEntry.getText().toString());
+                    String data = jsonObject.toString();
+                    postRequest.execute(url, data);
                 } catch (JSONException e) {
                     Toast.makeText(NewUserActivity.this, "JSON Error with username", Toast.LENGTH_LONG).show();
                 }
-                String url = "/account/checkUsername";
-                String data = jsonObject.toString();
-
-                postRequest.execute(url, data);
             }
         });
     }

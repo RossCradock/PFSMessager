@@ -4,15 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.rosscradock.pfsmessager.R;
 import com.rosscradock.pfsmessager.arrayAdapters.ContactArrayAdapter;
@@ -31,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Realm.init(this);
         Realm realm = Realm.getDefaultInstance();
-        KeyService.generateKeys(this);
 
         // check if logged in on pin lock
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("loggedin", false)){
@@ -62,7 +57,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // goto new contact screen
-
+                Intent intent = new Intent(MainActivity.this, NewUserActivity.class);
+                intent.putExtra("origin", "contact");
+                startActivity(intent);
+                finish();
             }
         });
 

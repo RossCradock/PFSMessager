@@ -8,27 +8,27 @@ public class Message extends RealmObject{
     private String recipient;
     private String message;
     private long timestamp;
-    private String hmac;
-    private String SenderPublicKey;
+    private String senderPublicKey;
     private String recipientPublicKey;
     private boolean read;
     private boolean received;
+    private int hashedKeyCount;
 
     public Message(){
 
     }
 
-    public Message(String sender, String recipient, String message, long timestamp, String hmac,
-                   String senderPublicKey, String recipientPublicKey, boolean read, boolean received) {
+    public Message(String sender, String recipient, String message, long timestamp, String senderPublicKey,
+                   String recipientPublicKey, boolean read, boolean received, int hashedKeyCount) {
         this.sender = sender;
         this.recipient = recipient;
         this.message = message;
         this.timestamp = timestamp;
-        this.hmac = hmac;
-        SenderPublicKey = senderPublicKey;
+        this.senderPublicKey = senderPublicKey;
         this.recipientPublicKey = recipientPublicKey;
         this.read = read;
         this.received = received;
+        this.hashedKeyCount = hashedKeyCount;
     }
 
     public String getSender() {
@@ -39,20 +39,12 @@ public class Message extends RealmObject{
         this.sender = sender;
     }
 
-    public String getHmac() {
-        return hmac;
-    }
-
-    public void setHmac(String hmac) {
-        this.hmac = hmac;
-    }
-
     public String getSenderPublicKey() {
-        return SenderPublicKey;
+        return senderPublicKey;
     }
 
     public void setSenderPublicKey(String senderPublicKey) {
-        SenderPublicKey = senderPublicKey;
+        senderPublicKey = senderPublicKey;
     }
 
     public String getRecipientPublicKey() {
@@ -101,5 +93,13 @@ public class Message extends RealmObject{
 
     public void setReceived(boolean received) {
         this.received = received;
+    }
+
+    public int getHashedKeyCount() {
+        return hashedKeyCount;
+    }
+
+    public void setHashedKeyCount(int hashedKeyCount) {
+        this.hashedKeyCount = hashedKeyCount;
     }
 }

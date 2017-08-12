@@ -12,15 +12,20 @@ public class Contact extends RealmObject{
     private RealmList<Message> messageList;
     private String sharedKey;
     private String publicKey;
+    private int hashedKeyCount;
+    private boolean firstMessage;
 
     public Contact() {
     }
 
-    public Contact(int id, String username, RealmList<Message> messageList, String sharedKey) {
+    public Contact(int id, String username, RealmList<Message> messageList, String sharedKey,
+                   int hashedKeyCount, boolean firstMessage) {
         this.id = id;
         this.username = username;
         this.messageList = messageList;
         this.sharedKey = sharedKey;
+        this.hashedKeyCount = hashedKeyCount;
+        this.firstMessage = firstMessage;
     }
 
     public int getId() {
@@ -61,5 +66,22 @@ public class Contact extends RealmObject{
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public int getHashedKeyCount() {
+        return hashedKeyCount;
+    }
+
+    public void setHashedKeyCount(int hashedKeyCount) {
+        this.hashedKeyCount = hashedKeyCount;
+
+    }
+
+    public boolean isFirstMessage() {
+        return firstMessage;
+    }
+
+    public void setFirstMessage(boolean firstMessage) {
+        this.firstMessage = firstMessage;
     }
 }

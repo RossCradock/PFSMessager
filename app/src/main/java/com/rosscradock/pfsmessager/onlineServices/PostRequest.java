@@ -31,7 +31,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
         HttpURLConnection client = null;
         String response;
         try {
-            url = new URL("http://webservice.golfbirdie.ie/" + data[0]);
+            url = new URL("http://pfsmessager.ddns.net" + data[0]);
             client = (HttpURLConnection) url.openConnection();
             client.setRequestMethod("GET");
             try{

@@ -2,11 +2,12 @@ package com.rosscradock.pfsmessager.encrypt;
 
 import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.rosscradock.pfsmessager.model.CachedKeyPair;
+import com.rosscradock.pfsmessager.model.Contact;
 
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -25,11 +26,27 @@ import io.realm.Realm;
 
 public class KeyService{
 
-    public static void generateKeys(Context context){
+    public static String generateOnlineKeys(Context context){
 
         Realm.init(context);
         Realm realm = Realm.getDefaultInstance();
 
+        final CachedKeyPair cachedKeyPair = generateLocalKeys(context);
+        if(cachedKeyPair == null){
+            return "failed";
+        }
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.copyToRealm(cachedKeyPair);
+            }
+        });
+
+        return cachedKeyPair.getPublicKey();
+    }
+
+    public static CachedKeyPair generateLocalKeys(Context context){
         KeyPairGenerator keyPairGenerator = null;
         try {
             keyPairGenerator = KeyPairGenerator.getInstance("EC");
@@ -43,24 +60,32 @@ public class KeyService{
 
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
-
         try {
-            final CachedKeyPair cachedKeyPair = new CachedKeyPair(publicKeyToString(publicKey), privateKeyToString(privateKey));
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    realm.copyToRealm(cachedKeyPair);
-                }
-            });
+            return new CachedKeyPair(publicKeyToString(publicKey), privateKeyToString(privateKey));
         } catch (GeneralSecurityException e) {
-            Toast.makeText(context, "key to string operation failed", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public static byte[] getSharedSecret(Context context, CachedKeyPair cachedKeyPair, String otherPublicKeyString){
 
-        // use else where
-        //CachedKeyPair cachedKeyPair = realm.where(CachedKeyPair.class).equalTo("publicKey", ownPublicKeyString).findFirst();
+    public static String getSharedSecret(Context context, String otherPublicKeyString){
+
+        CachedKeyPair cachedKeyPair = generateLocalKeys(context);
+        return sharedSecret(context, cachedKeyPair, otherPublicKeyString);
+    }
+
+    public static String getSharedSecret(Context context, String otherPublicKeyString, String ownPublicKey){
+        Realm.init(context);
+        Realm realm = Realm.getDefaultInstance();
+
+        CachedKeyPair cachedKeyPair = realm.where(CachedKeyPair.class).equalTo("publicKey", ownPublicKey).findFirst();
+        return sharedSecret(context, cachedKeyPair, otherPublicKeyString);
+    }
+
+    private static String sharedSecret(Context context, CachedKeyPair cachedKeyPair, String otherPublicKeyString){
+        Realm.init(context);
+        Realm realm = Realm.getDefaultInstance();
 
         KeyAgreement keyAgreement = null;
         try {
@@ -75,8 +100,17 @@ public class KeyService{
                 Toast.makeText(context, "string to key failed", Toast.LENGTH_LONG).show();
             }
 
-            return keyAgreement.generateSecret();
-            //Log.e("Shared secret: ", new String(sharedSecret, StandardCharsets.UTF_8));
+            final String sharedSecret = new String(keyAgreement.generateSecret(), StandardCharsets.UTF_8);
+
+            final Contact contact = realm.where(Contact.class).equalTo("publicKey", otherPublicKeyString).findFirst();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    contact.setSharedKey(sharedSecret);
+                }
+            });
+
+            return sharedSecret;
         } catch (NoSuchAlgorithmException e) {
             Toast.makeText(context, "elliptic curve algorithm failed", Toast.LENGTH_LONG).show();
             return null;
