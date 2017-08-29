@@ -10,27 +10,35 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+
 public class KeyCheckOnline {
 
     public static void checkSpareKeys(final Context context, final String username){
         PostRequest postRequest = new PostRequest(new TaskCompleted() {
             @Override
             public void onTaskCompleted(String response) {
-                if(response.contains("requires")){
-                    int index = response.indexOf("requires ");
-                    int numberOfKeysNeeded = Integer.parseInt(Character.toString(response.charAt(index + 9)));
 
-                    String[] publicKeys = {};
-                    for(int i = 0; i < numberOfKeysNeeded; i++){
-                        String publicKey = KeyService.generateOnlineKeys(context);
-                        if(publicKey.contains("failed")){
-                            Toast.makeText(context, "Key to string failed in keyCheckOnline", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        publicKeys[i] = publicKey;
+            try {
+                JSONObject json = new JSONObject(response);
+                int numberOfKeysNeeded = json.getInt("spareKeys");
+
+                String[] publicKeys = {};
+                for(int i = 0; i < numberOfKeysNeeded; i++){
+                    String publicKey = KeyService.generateOnlineKeys(context);
+                    if(publicKey.contains("failed")){
+                        Toast.makeText(context, "Key to string failed in keyCheckOnline", Toast.LENGTH_LONG).show();
+                        return;
                     }
-                    sendPublicKeysToDatabase(context, publicKeys, username);
+                    publicKeys[i] = publicKey;
                 }
+                sendPublicKeysToDatabase(context, publicKeys, username);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             }
         });
 
@@ -72,16 +80,19 @@ public class KeyCheckOnline {
             }
         });
 
+        String data = null;
         try {
-            JSONObject jsonObject = new JSONObject();
-            JSONArray jsonArray = new JSONArray(publicKeys);
-            jsonObject.put("username", username);
-            jsonObject.put("keys", jsonArray);
-            String url = "/keys/storeKeys";
-            String data = jsonObject.toString();
-            postRequest.execute(url, data);
-        } catch (JSONException e) {
+            HashMap<String, String> json = new HashMap<>();
+
+            json.put("username", username);
+            data = MapToJsonString.get(json);
+            data = data + "&" + URLEncoder.encode("keys", "UTF-8")+ "=" + MapToJsonString.getArray(publicKeys);
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        String url = "/keys/storeKeys";
+
+        postRequest.execute(url, data);
     }
 }

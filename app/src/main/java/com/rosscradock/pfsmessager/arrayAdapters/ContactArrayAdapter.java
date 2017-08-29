@@ -15,6 +15,8 @@ import com.rosscradock.pfsmessager.model.Message;
 
 import java.util.List;
 
+import io.realm.Realm;
+
 public class ContactArrayAdapter extends ArrayAdapter {
 
     private Context context;
@@ -48,7 +50,13 @@ public class ContactArrayAdapter extends ArrayAdapter {
     }
 
     private String numberOfUnreadMessages(){
-        List<Message> messages = currentContact.getMessageList();
+        Realm.init(context);
+        Realm realm = Realm.getDefaultInstance();
+
+        List<Message> messages = realm.where(Message.class)
+                .equalTo("sender", currentContact.getUsername()).or()
+                .equalTo("recipient", currentContact.getUsername())
+                .findAll();
         int totalUnreadMessages = 0;
         for(Message message : messages){
             if(!message.isRead()){

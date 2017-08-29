@@ -1,4 +1,4 @@
-package com.rosscradock.pfsmessager.services;
+package com.rosscradock.pfsmessager.firbase;
 
 import android.util.Log;
 import com.google.firebase.iid.FirebaseInstanceId;

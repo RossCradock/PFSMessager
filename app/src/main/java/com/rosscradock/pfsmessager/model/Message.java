@@ -10,6 +10,7 @@ public class Message extends RealmObject{
     private long timestamp;
     private String senderPublicKey;
     private String recipientPublicKey;
+    private String hmac;
     private boolean read;
     private boolean received;
     private int hashedKeyCount;
@@ -19,13 +20,14 @@ public class Message extends RealmObject{
     }
 
     public Message(String sender, String recipient, String message, long timestamp, String senderPublicKey,
-                   String recipientPublicKey, boolean read, boolean received, int hashedKeyCount) {
+                   String recipientPublicKey, String hmac, boolean read, boolean received, int hashedKeyCount) {
         this.sender = sender;
         this.recipient = recipient;
         this.message = message;
         this.timestamp = timestamp;
         this.senderPublicKey = senderPublicKey;
         this.recipientPublicKey = recipientPublicKey;
+        this.hmac = hmac;
         this.read = read;
         this.received = received;
         this.hashedKeyCount = hashedKeyCount;
@@ -53,6 +55,14 @@ public class Message extends RealmObject{
 
     public void setRecipientPublicKey(String recipientPublicKey) {
         this.recipientPublicKey = recipientPublicKey;
+    }
+
+    public String getHmac() {
+        return hmac;
+    }
+
+    public void setHmac(String hmac) {
+        this.hmac = hmac;
     }
 
     public String getRecipient() {

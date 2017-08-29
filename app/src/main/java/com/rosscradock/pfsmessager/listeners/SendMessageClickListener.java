@@ -1,11 +1,9 @@
 package com.rosscradock.pfsmessager.listeners;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Toast;
 
-import com.rosscradock.pfsmessager.activities.NewUserActivity;
 import com.rosscradock.pfsmessager.encrypt.AES;
 import com.rosscradock.pfsmessager.encrypt.HMAC;
 import com.rosscradock.pfsmessager.encrypt.KeyDerivation;
@@ -14,6 +12,7 @@ import com.rosscradock.pfsmessager.interfaces.TaskCompleted;
 import com.rosscradock.pfsmessager.model.Contact;
 import com.rosscradock.pfsmessager.model.Message;
 import com.rosscradock.pfsmessager.model.User;
+import com.rosscradock.pfsmessager.onlineServices.KeyCheckOnline;
 import com.rosscradock.pfsmessager.onlineServices.PostRequest;
 
 import org.json.JSONException;
@@ -92,6 +91,9 @@ public class SendMessageClickListener implements View.OnClickListener {
         String senderPublicKey = "";
         String recipientPublicKey = "";
 
+        // get hmac
+        String hmac = HMAC.getHMAC(newMessage.trim(), contact.getSharedKey());
+
         // encrypt message
         AES.setKey(contact.getSharedKey());
         String encryptedMessage = AES.encrypt(newMessage.trim());
@@ -103,6 +105,7 @@ public class SendMessageClickListener implements View.OnClickListener {
                 System.currentTimeMillis(),
                 senderPublicKey,
                 recipientPublicKey,
+                hmac,
                 false,
                 false,
                 contact.getHashedKeyCount());

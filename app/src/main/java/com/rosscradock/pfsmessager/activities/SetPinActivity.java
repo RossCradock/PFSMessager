@@ -59,6 +59,7 @@ public class SetPinActivity extends AppCompatActivity {
                                 .edit()
                                 .putBoolean("loggedin", true)
                                 .apply();
+                        realm.copyToRealm(user);
                         Intent intent = new Intent(SetPinActivity.this, NewUserActivity.class);
                         intent.putExtra("origin", "user");
                         startActivity(intent);

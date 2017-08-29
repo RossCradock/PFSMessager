@@ -14,10 +14,16 @@ import com.rosscradock.pfsmessager.interfaces.TaskCompleted;
 import com.rosscradock.pfsmessager.model.Contact;
 import com.rosscradock.pfsmessager.model.User;
 import com.rosscradock.pfsmessager.onlineServices.KeyCheckOnline;
+import com.rosscradock.pfsmessager.onlineServices.MapToJsonString;
 import com.rosscradock.pfsmessager.onlineServices.PostRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.Realm;
 
@@ -122,14 +128,16 @@ public class NewUserActivity extends AppCompatActivity {
                     }
                 });
 
-                JSONObject jsonObject = new JSONObject();
                 try {
                     String url = (origin.equals("user")) ? "/account/newUser" : "/account/checkUsername";
-                    jsonObject.put("username", usernameEntry.getText().toString());
-                    String data = jsonObject.toString();
+
+                    HashMap<String, String> json = new HashMap<>();
+                    json.put("username", usernameEntry.getText().toString());
+                    String data = MapToJsonString.get(json);
+
                     postRequest.execute(url, data);
-                } catch (JSONException e) {
-                    Toast.makeText(NewUserActivity.this, "JSON Error with username", Toast.LENGTH_LONG).show();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
         });

@@ -12,7 +12,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginRight="-15dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="9dp"
         android:layout_weight="1"
         android:src="@drawable/arrow_bg2" />
 

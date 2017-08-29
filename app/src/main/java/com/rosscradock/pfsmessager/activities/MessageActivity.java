@@ -26,6 +26,8 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -42,8 +44,15 @@ public class MessageActivity extends AppCompatActivity {
         final Contact contact = realm.where(Contact.class).equalTo("username", contactUsername).findFirst();
         ((TextView)findViewById(R.id.contact_name_message_textview)).setText(contact.getUsername());
 
-        //get message list, set the empty view and set adapter
-        final RealmList<Message> messages = contact.getMessageList();
+        //get messages list from realm and sort chronologically
+        final List<Message> messages = realm.copyFromRealm(
+                realm.where(Message.class)
+                        .equalTo("sender", contactUsername).or()
+                        .equalTo("recipient", contactUsername)
+                        .findAll()
+                        .sort("timestamp", Sort.DESCENDING));
+
+        // set the empty view and set adapter
         ListView messageListView = (ListView)findViewById(R.id.messages_listview);
         messageListView.setEmptyView(findViewById(R.id.empty_message_listview));
         final MessageArrayAdapter adapter = new MessageArrayAdapter(this, R.layout.contact_message_listview_item, messages);
@@ -58,7 +67,8 @@ public class MessageActivity extends AppCompatActivity {
                     public void execute(Realm realm) {
                         Message deleteMessage = messages.get(position);
                         if(deleteMessage.isValid()){
-                            deleteMessage.deleteFromRealm();
+                            RealmResults<Message> rows = realm.where(Message.class).equalTo("timestamp", deleteMessage.getTimestamp()).findAll();
+                            rows.deleteAllFromRealm();
                             messages.remove(position);
                             adapter.notifyDataSetChanged();
                         }
@@ -99,7 +109,7 @@ public class MessageActivity extends AppCompatActivity {
                 User user = realm.where(User.class).findFirst();
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    String url = "/keys/refreshKey";
+                    String url = "/keyHashCount/setKeyHashCount";
                     jsonObject.put("username1", user.getUsername());
                     jsonObject.put("username2", contact.getUsername());
                     String data = jsonObject.toString();

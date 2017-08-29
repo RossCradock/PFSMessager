@@ -1,17 +1,26 @@
 package com.rosscradock.pfsmessager.onlineServices;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.rosscradock.pfsmessager.interfaces.TaskCompleted;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PostRequest extends AsyncTask<String, Void, String> {
 
@@ -33,10 +42,19 @@ public class PostRequest extends AsyncTask<String, Void, String> {
         try {
             url = new URL("http://pfsmessager.ddns.net" + data[0]);
             client = (HttpURLConnection) url.openConnection();
-            client.setRequestMethod("GET");
-            try{
-                client.addRequestProperty("apptoken", data[1]);
-            } catch(ArrayIndexOutOfBoundsException ignored){}
+            client.setRequestMethod("POST");
+            //client.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            //client.setRequestProperty("Accept","application/json");
+            client.setDoOutput(true);
+            client.setDoInput(true);
+
+            OutputStream outputStream = client.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            writer.write(data[1]);
+            Log.e("*****DATA*****", data[1]);
+            writer.flush();
+            writer.close();
+
             int statusCode = client.getResponseCode();
             if(statusCode == 200){
                 InputStream inputStream = new BufferedInputStream(client.getInputStream());
@@ -49,12 +67,20 @@ public class PostRequest extends AsyncTask<String, Void, String> {
                 }
                 response = stringBuilder.toString();
             } else{
-                response = "Error occurred, status code: " + statusCode;
+                InputStream errorStream = new BufferedInputStream(client.getErrorStream());
+                InputStreamReader reader = new InputStreamReader(errorStream);
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                StringBuilder builder = new StringBuilder();
+                String chunks;
+                while((chunks = bufferedReader.readLine()) != null){
+                    builder.append(chunks);
+                }
+                response = builder.toString();
             }
         } catch(MalformedURLException mue){
             return "ERROR:MUE Malformed URL";
         } catch(IOException ioe) {
-            return "ERROR:IOE Could Not Connect To Client";
+            return ioe.getMessage();
         } finally{
             if(client != null)client.disconnect();
         }
@@ -71,5 +97,4 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onProgressUpdate(Void... values) {}
-
 }

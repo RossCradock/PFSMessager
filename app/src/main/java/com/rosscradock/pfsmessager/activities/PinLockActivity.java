@@ -24,7 +24,7 @@ public class PinLockActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pin_lock_activity);
         Realm.init(this);
-        Realm realm = Realm.getDefaultInstance();
+        final Realm realm = Realm.getDefaultInstance();
 
         // check if pin has been set
         try{
@@ -32,6 +32,7 @@ public class PinLockActivity extends AppCompatActivity {
         }catch (NullPointerException e){
             startActivity(new Intent(this, SetPinActivity.class));
             finish();
+            return;
         }
 
         PinLockView pinLockView = (PinLockView) findViewById(R.id.pin_lock_view);
@@ -41,7 +42,11 @@ public class PinLockActivity extends AppCompatActivity {
         pinLockView.setPinLockListener(new PinLockListener() {
             @Override
             public void onComplete(String pin) {
-
+                User user = realm.where(User.class).findFirst();
+                if(user.getPin().equals(pin)){
+                    startActivity(new Intent(PinLockActivity.this, MainActivity.class));
+                    finish();
+                }
             }
 
             @Override

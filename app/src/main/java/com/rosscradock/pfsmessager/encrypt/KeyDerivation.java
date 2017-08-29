@@ -13,7 +13,6 @@ public class KeyDerivation {
         String sharedKey = contact.getSharedKey();
         int difference = (hashedKeyCount - contact.getHashedKeyCount());
         for(int i = 0; i < difference; i++){
-            MessageDigest digest = null;
             try {
                 MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
                 sharedKey = new String(messageDigest.digest(sharedKey.getBytes(StandardCharsets.UTF_8)));
@@ -21,6 +20,7 @@ public class KeyDerivation {
                 e.printStackTrace();
             }
         }
+
 
         return sharedKey;
     }

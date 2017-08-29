@@ -6,17 +6,23 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.rosscradock.pfsmessager.R;
 import com.rosscradock.pfsmessager.arrayAdapters.ContactArrayAdapter;
 import com.rosscradock.pfsmessager.model.Contact;
+import com.rosscradock.pfsmessager.model.Message;
+import com.rosscradock.pfsmessager.model.User;
+import com.rosscradock.pfsmessager.onlineServices.KeyCheckOnline;
 
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,19 +32,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Realm.init(this);
         Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<User> rows = realm.where(User.class).findAll();
+                rows.deleteAllFromRealm();
+            }
+        });
+
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
 
         // check if logged in on pin lock
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("loggedin", false)){
             startActivity(new Intent(this, PinLockActivity.class));
             finish();
+            return;
         }
 
+        // get list of contacts and display in array adapter
         final List<Contact> contacts = realm.where(Contact.class).findAll();
         ListView contactsListView = (ListView)findViewById(R.id.contacts_listview);
         contactsListView.setEmptyView(findViewById(R.id.empty_contacts_listview));
         ContactArrayAdapter adapter = new ContactArrayAdapter(this, R.layout.contact_listview_item, contacts);
         contactsListView.setAdapter(adapter);
 
+        // set the click listener for contacts
         contactsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -48,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+        // new contact
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // key check after coming online
+        //KeyCheckOnline.checkSpareKeys(this, realm.where(User.class).findFirst().getUsername());
     }
 
     @Override
