@@ -56,7 +56,7 @@ public class NewUserActivity extends AppCompatActivity {
         findViewById(R.id.new_user_check_availability).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: need to check if online otherwise it thinks the username check was good
                 // start new aync task to check username
                 PostRequest postRequest = new PostRequest(new TaskCompleted() {
                     @Override
