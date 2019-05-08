@@ -1,5 +1,6 @@
 package com.rosscradock.pfsmessager.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,10 +15,11 @@ import com.rosscradock.pfsmessager.R;
 import com.rosscradock.pfsmessager.model.User;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class PinLockActivity extends AppCompatActivity {
 
-    private String pin;
+    private boolean newActivityStarted = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -25,27 +27,30 @@ public class PinLockActivity extends AppCompatActivity {
         setContentView(R.layout.pin_lock_activity);
         Realm.init(this);
         final Realm realm = Realm.getDefaultInstance();
+        final Context context = this;
 
         // check if pin has been set
-        try{
-            pin = realm.where(User.class).findFirst().getPin();
-        }catch (NullPointerException e){
+        if(null == realm.where(User.class).findFirst()){
             startActivity(new Intent(this, SetPinActivity.class));
+            newActivityStarted = true;
             finish();
-            return;
         }
 
-        PinLockView pinLockView = (PinLockView) findViewById(R.id.pin_lock_view);
-        IndicatorDots indicatorDots = (IndicatorDots) findViewById(R.id.indicator_dots);
+        PinLockView pinLockView = findViewById(R.id.pin_lock_view);
+        IndicatorDots indicatorDots = findViewById(R.id.indicator_dots);
 
         pinLockView.attachIndicatorDots(indicatorDots);
         pinLockView.setPinLockListener(new PinLockListener() {
             @Override
             public void onComplete(String pin) {
-                User user = realm.where(User.class).findFirst();
-                if(user.getPin().equals(pin)){
-                    startActivity(new Intent(PinLockActivity.this, MainActivity.class));
-                    finish();
+                RealmResults<User> users = realm.where(User.class).findAll();
+                for(User user : users) {
+                    if (user.getPin().equals(pin)) {
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("loggedin", true).apply();
+                        startActivity(new Intent(PinLockActivity.this, MainActivity.class));
+                        newActivityStarted = true;
+                        finish();
+                    }
                 }
             }
 
@@ -68,6 +73,8 @@ public class PinLockActivity extends AppCompatActivity {
 
     public void onPause(){
         super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        if(!newActivityStarted) {
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        }
     }
 }

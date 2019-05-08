@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,8 @@ public class PostRequest extends AsyncTask<String, Void, String> {
         HttpURLConnection client = null;
         String response;
         try {
-            url = new URL("http://pfsmessager.ddns.net" + data[0]);
+            //url = new URL("http://PFSMessager.us-east-2.elasticbeanstalk.com" + data[0]);
+            url = new URL("http://10.0.2.2:8080/PFSMessager" + data[0]);
             client = (HttpURLConnection) url.openConnection();
             client.setRequestMethod("POST");
             //client.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -49,7 +51,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
             client.setDoInput(true);
 
             OutputStream outputStream = client.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
             writer.write(data[1]);
             Log.e("*****DATA*****", data[1]);
             writer.flush();

@@ -5,19 +5,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.rosscradock.pfsmessager.R;
 import com.rosscradock.pfsmessager.arrayAdapters.ContactArrayAdapter;
 import com.rosscradock.pfsmessager.model.Contact;
-import com.rosscradock.pfsmessager.model.Message;
 import com.rosscradock.pfsmessager.model.User;
-import com.rosscradock.pfsmessager.onlineServices.KeyCheckOnline;
 
 import java.util.List;
 
@@ -26,33 +21,26 @@ import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean newActivityStarted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Realm.init(this);
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                RealmResults<User> rows = realm.where(User.class).findAll();
-                rows.deleteAllFromRealm();
-            }
-        });
-
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
-
         // check if logged in on pin lock
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("loggedin", false)){
             startActivity(new Intent(this, PinLockActivity.class));
+            newActivityStarted = true;
             finish();
             return;
         }
 
         // get list of contacts and display in array adapter
         final List<Contact> contacts = realm.where(Contact.class).findAll();
-        ListView contactsListView = (ListView)findViewById(R.id.contacts_listview);
-        contactsListView.setEmptyView(findViewById(R.id.empty_contacts_listview));
+        ListView contactsListView = findViewById(R.id.contacts_listview);
+        contactsListView.setEmptyView(findViewById(R.id.empty_view));
         ContactArrayAdapter adapter = new ContactArrayAdapter(this, R.layout.contact_listview_item, contacts);
         contactsListView.setAdapter(adapter);
 
@@ -67,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // new contact
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, NewUserActivity.class);
                 intent.putExtra("origin", "contact");
                 startActivity(intent);
+                newActivityStarted = true;
                 finish();
             }
         });
@@ -86,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        if(!newActivityStarted) {
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        }
     }
 }

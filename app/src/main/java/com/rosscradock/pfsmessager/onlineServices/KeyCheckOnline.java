@@ -86,7 +86,7 @@ public class KeyCheckOnline {
 
             json.put("username", username);
             data = MapToJsonString.get(json);
-            data = data + "&" + URLEncoder.encode("keys", "UTF-8")+ "=" + MapToJsonString.getArray(publicKeys);
+            data = data + "&" + URLEncoder.encode("keys", "UTF-8") + "=" + MapToJsonString.getArray(publicKeys);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

@@ -18,6 +18,7 @@ import io.realm.Realm;
 public class SetPinActivity extends AppCompatActivity {
 
     private Realm realm;
+    private boolean newActivityStarted = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -26,7 +27,7 @@ public class SetPinActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        EditText pinText = (EditText)findViewById(R.id.pinText);
+        EditText pinText = findViewById(R.id.pinText);
         pinText.requestFocus();
 
         pinText.addTextChangedListener(new TextWatcher() {
@@ -60,9 +61,11 @@ public class SetPinActivity extends AppCompatActivity {
                                 .putBoolean("loggedin", true)
                                 .apply();
                         realm.copyToRealm(user);
+
                         Intent intent = new Intent(SetPinActivity.this, NewUserActivity.class);
                         intent.putExtra("origin", "user");
                         startActivity(intent);
+                        newActivityStarted = true;
                         finish();
                     }
                 });
@@ -72,6 +75,7 @@ public class SetPinActivity extends AppCompatActivity {
         verifyPinDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                newActivityStarted = true;
                 finish();
             }
         });
@@ -81,6 +85,8 @@ public class SetPinActivity extends AppCompatActivity {
 
     public void onPause(){
         super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        if(!newActivityStarted) {
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        }
     }
 }

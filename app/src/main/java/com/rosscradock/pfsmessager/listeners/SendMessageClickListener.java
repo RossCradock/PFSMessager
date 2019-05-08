@@ -47,21 +47,21 @@ public class SendMessageClickListener implements View.OnClickListener {
                 @Override
                 public void onTaskCompleted(final String response) {
 
-                    if(!response.contains("failed")){
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                try {
-                                    JSONObject jsonObject = new JSONObject(response);
-                                    String sharedSecret = KeyService.getSharedSecret(context, jsonObject.getString("publicKey"));
-                                    contact.setSharedKey(sharedSecret);
-                                    sendMessage();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
+                if(!response.contains("failed")){
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String sharedSecret = KeyService.getSharedSecret(context, jsonObject.getString("publicKey"));
+                            contact.setSharedKey(sharedSecret);
+                            sendMessage();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        }
+                    });
+                }
                 }
             });
 

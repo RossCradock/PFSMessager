@@ -25,11 +25,12 @@ import org.json.JSONObject;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
 public class MessageActivity extends AppCompatActivity {
+
+    private boolean newActivityStarted = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -42,6 +43,7 @@ public class MessageActivity extends AppCompatActivity {
         // get contacts name and set to textview
         String contactUsername = getIntent().getStringExtra("contact");
         final Contact contact = realm.where(Contact.class).equalTo("username", contactUsername).findFirst();
+
         ((TextView)findViewById(R.id.contact_name_message_textview)).setText(contact.getUsername());
 
         //get messages list from realm and sort chronologically
@@ -53,7 +55,7 @@ public class MessageActivity extends AppCompatActivity {
                         .sort("timestamp", Sort.DESCENDING));
 
         // set the empty view and set adapter
-        ListView messageListView = (ListView)findViewById(R.id.messages_listview);
+        ListView messageListView = findViewById(R.id.messages_listview);
         messageListView.setEmptyView(findViewById(R.id.empty_message_listview));
         final MessageArrayAdapter adapter = new MessageArrayAdapter(this, R.layout.contact_message_listview_item, messages);
         messageListView.setAdapter(adapter);
@@ -78,14 +80,14 @@ public class MessageActivity extends AppCompatActivity {
         });
 
         // send message
-        TextView newMessageTextView = ((TextView)findViewById(R.id.new_message));
+        TextView newMessageTextView = findViewById(R.id.new_message);
         (findViewById(R.id.send_message_imageview)).setOnClickListener(
                 new SendMessageClickListener(
                         this, newMessageTextView.getText().toString(), contact
                 ));
 
         // refresh keys
-        Button refreshKeysButton = (Button)findViewById(R.id.change_keys_message_button);
+        Button refreshKeysButton = findViewById(R.id.change_keys_message_button);
         refreshKeysButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,5 +121,12 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void onPause(){
+        super.onPause();
+        if(!newActivityStarted) {
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("loggedin", false).apply();
+        }
     }
 }
